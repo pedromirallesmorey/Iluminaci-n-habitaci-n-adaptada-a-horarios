@@ -347,7 +347,8 @@ cards:
       action: call-service
       service: script.luz_dormir
 ```
-📲 Panel controles manuales
+
+### 📲 Panel controles manuales
 ![](https://github.com/pedromirallesmorey/Iluminaci-n-habitaci-n-adaptada-a-horarios/blob/main/ejecutar_manual.PNG?raw=true)
 
 ```
