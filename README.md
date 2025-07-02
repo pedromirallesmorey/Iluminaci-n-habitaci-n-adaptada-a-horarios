@@ -268,6 +268,7 @@ actions:
 ```
 ## 🖼️ Paso 4: Panel visual tipo Bubble Card
 ### 📲 Panel despertar
+![](https://github.com/pedromirallesmorey/Iluminaci-n-habitaci-n-adaptada-a-horarios/blob/main/despertar_diario.PNG?raw=true)
 
 ```
 type: vertical-stack
@@ -308,6 +309,7 @@ cards:
       - input_datetime.hora_domingo
 ```
 ### 📲 Panel acostarse
+![](https://github.com/pedromirallesmorey/Iluminaci-n-habitaci-n-adaptada-a-horarios/blob/main/acostarse.PNG?raw=true)
 
 ```
 type: grid
@@ -346,6 +348,7 @@ cards:
       service: script.luz_dormir
 ```
 📲 Panel controles manuales
+![](https://github.com/pedromirallesmorey/Iluminaci-n-habitaci-n-adaptada-a-horarios/blob/main/ejecutar_manual.PNG?raw=true)
 
 ```
 type: vertical-stack
