@@ -94,10 +94,315 @@ input_datetime:
 
 ## 💡 Paso 2. Scripts de luz personalizada
 
+Cada día ejecuta un script distinto con colores y transiciones únicas:
 
+### 🌅 2.1 Luz de despertar por día (ejemplo: lunes)
 
+```
+luz_despertar_lunes:
+  alias: Luz despertar lunes
+  sequence:
+    - service: light.turn_on
+      target:
+        entity_id:
+        - light.led_dormitorio
+        - light.lampara_susana
+        - light.lampara_pedro
+      data:
+        brightness: 220
+        rgb_color:
+        - 255
+        - 223
+        - 186
+        transition: 90
+    - service: input_datetime.set_datetime
+      target:
+        entity_id: input_datetime.hora_ultimo_despertar
+      data:
+        datetime: '{{ now().isoformat() }}'
+```
 
+🔁 Repite lo mismo para luz_despertar_martes, miercoles, etc., variando el color si lo deseas.
+También puedes usar un único script con lógica condicional, si quieres simplificar.
 
+### 🌙 2.2 Script para rutina de acostarse
 
+```
+luz_acostarse:
+  alias: Luz acostarse
+  sequence:
+  - service: light.turn_on
+    target:
+      entity_id:
+        - light.led_dormitorio
+    data:
+      brightness: 100
+      rgb_color:
+      - 240
+      - 180
+      - 120  # tono cálido
+      transition: 60
+```
 
+### 😴 2.3 Script para dormir profundamente
 
+```
+luz_dormir:
+  alias: Luz dormir
+  sequence:
+    - service: light.turn_off
+      target:
+        entity_id:
+          - light.lampara_susana
+          - light.lampara_pedro
+    - service: light.turn_on
+      target:
+        entity_id: light.led_dormitorio
+      data:
+        brightness: 10
+        rgb_color:
+        - 255
+        - 100
+        - 60
+        transition: 30
+```
+
+## ⚙️ Paso 3: Automatizaciones
+### ⏰ 3.1 Automatización: Despertar por día
+
+Esta automatización:
+
+✅ Se ejecuta cada minuto   
+✅ Comprueba que el estado general no esté en “Vacaciones” o “Ausente”   
+✅ Verifica si la hora actual coincide con la de ese día   
+✅ Llama al script correspondiente   
+✅ Registra la hora
+
+```
+alias: Despertar - por día
+trigger:
+  - platform: time_pattern
+    minutes: "/1"
+
+condition:
+  - condition: state
+    entity_id: input_boolean.rutina_despertar_activada
+    state: "on"
+  - condition: template
+    value_template: "{{ states('input_select.estados') not in ['Vacaciones', 'Ausente'] }}"
+  - condition: template
+    value_template: >
+      {% set hoy = now().weekday() %}
+      {% set horas = {
+        0: states('input_datetime.hora_lunes')[0:5],
+        1: states('input_datetime.hora_martes')[0:5],
+        2: states('input_datetime.hora_miercoles')[0:5],
+        3: states('input_datetime.hora_jueves')[0:5],
+        4: states('input_datetime.hora_viernes')[0:5],
+        5: states('input_datetime.hora_sabado')[0:5],
+        6: states('input_datetime.hora_domingo')[0:5]
+      } %}
+      {{ now().strftime('%H:%M') == horas[hoy] }}
+
+action:
+  - choose:
+      - conditions: "{{ now().weekday() == 0 }}"
+        sequence: [{ service: script.luz_despertar_lunes }]
+      - conditions: "{{ now().weekday() == 1 }}"
+        sequence: [{ service: script.luz_despertar_martes }]
+      - conditions: "{{ now().weekday() == 2 }}"
+        sequence: [{ service: script.luz_despertar_miercoles }]
+      - conditions: "{{ now().weekday() == 3 }}"
+        sequence: [{ service: script.luz_despertar_jueves }]
+      - conditions: "{{ now().weekday() == 4 }}"
+        sequence: [{ service: script.luz_despertar_viernes }]
+      - conditions: "{{ now().weekday() == 5 }}"
+        sequence: [{ service: script.luz_despertar_sabado }]
+      - conditions: "{{ now().weekday() == 6 }}"
+        sequence: [{ service: script.luz_despertar_domingo }]
+
+mode: single
+```
+
+### 🌙 3.2 Automatización: Acostarse
+
+Esta rutina se lanza a la hora indicada, si está activada y no estás en modo vacaciones/ausente:
+
+```
+alias: Acostarse - rutina nocturna
+trigger:
+  - platform: time
+    at: input_datetime.hora_acostarse
+condition:
+  - condition: state
+    entity_id: input_boolean.rutina_acostarse_activada
+    state: "on"
+  - condition: template
+    value_template: "{{ states('input_select.estados') not in ['Vacaciones', 'Ausente'] }}"
+action:
+  - service: script.luz_acostarse
+mode: single
+```
+### 🛌 3.3 Automatización: Dormir profundo activa apagado
+
+```
+alias: Dormir - apagar luces
+mode: single
+trigger:
+  - event_type: call_service
+    event_data:
+      domain: script
+      service: turn_on
+      service_data:
+        entity_id: script.luz_dormir
+    trigger: event
+actions:
+  - target:
+      entity_id:
+        - light.lampara_pedro
+        - light.lampara_susana
+        - light.led_dormitorio
+    data:
+      transition: 5
+    action: light.turn_off
+```
+## 🖼️ Paso 4: Panel visual tipo Bubble Card
+### 📲 Panel despertar
+
+```
+type: vertical-stack
+cards:
+  - type: custom:button-card
+    name: 🌅 Despertar
+    styles:
+      card:
+        - font-size: 22px
+        - font-weight: bold
+        - text-align: center
+        - padding: 16px
+  - type: entities
+    title: 🏠 Estado del hogar
+    entities:
+      - entity: input_select.estados
+    show_header_toggle: false
+  - type: entities
+    title: 🔧 Configuración
+    show_header_toggle: false
+    entities:
+      - entity: input_boolean.rutina_de_despertar_activada
+      - entity: input_boolean.rutina_de_acostarse_activada
+  - type: custom:mushroom-entity-card
+    entity: input_datetime.ultimo_despertar_ejecutado
+    name: Último despertar ejecutado
+    icon_color: deep-orange
+  - type: entities
+    title: 📆 Horarios despertar por día
+    show_header_toggle: false
+    entities:
+      - input_datetime.hora_lunes
+      - input_datetime.hora_martes
+      - input_datetime.hora_miercoles
+      - input_datetime.hora_jueves
+      - input_datetime.hora_viernes
+      - input_datetime.hora_sabado
+      - input_datetime.hora_domingo
+```
+### 📲 Panel acostarse
+
+```
+type: grid
+cards:
+  - type: vertical-stack
+    cards:
+      - type: custom:button-card
+        name: 🌛 Acostarse
+        styles:
+          card:
+            - font-size: 20px
+            - font-weight: bold
+            - padding: 16px
+            - text-align: center
+      - type: entities
+        title: 🔧 Configuración
+        show_header_toggle: false
+        entities:
+          - input_boolean.rutina_de_acostarse_activada
+          - input_datetime.hora_para_acostarse
+  - show_name: true
+    show_icon: true
+    type: button
+    name: Ejecutar rutina acostarse
+    icon: mdi:lamp
+    tap_action:
+      action: call-service
+      service: script.luz_acostarse
+  - show_name: true
+    show_icon: true
+    type: button
+    name: Ejecutar dormir profundo
+    icon: mdi:weather-night
+    tap_action:
+      action: call-service
+      service: script.luz_dormir
+```
+📲 Panel controles manuales
+
+```
+type: vertical-stack
+cards:
+  - type: custom:mushroom-title-card
+    title: ⚡ Ejecutar manualmente luz por día
+  - square: false
+    type: grid
+    columns: 2
+    cards:
+      - type: custom:mushroom-template-card
+        primary: Lunes
+        icon: mdi:weather-sunny
+        icon_color: amber
+        tap_action:
+          action: call-service
+          service: script.luz_despertar_lunes
+      - type: custom:mushroom-template-card
+        primary: Martes
+        icon: mdi:weather-partly-cloudy
+        icon_color: orange
+        tap_action:
+          action: call-service
+          service: script.luz_despertar_martes
+      - type: custom:mushroom-template-card
+        primary: Miércoles
+        icon: mdi:weather-hazy
+        icon_color: yellow
+        tap_action:
+          action: call-service
+          service: script.luz_despertar_miercoles
+      - type: custom:mushroom-template-card
+        primary: Jueves
+        icon: mdi:leaf
+        icon_color: green
+        tap_action:
+          action: call-service
+          service: script.luz_despertar_jueves
+      - type: custom:mushroom-template-card
+        primary: Viernes
+        icon: mdi:weather-cloudy
+        icon_color: blue
+        tap_action:
+          action: call-service
+          service: script.luz_despertar_viernes
+      - type: custom:mushroom-template-card
+        primary: Sábado
+        icon: mdi:music
+        icon_color: deep-purple
+        tap_action:
+          action: call-service
+          service: script.luz_despertar_sabado
+      - type: custom:mushroom-template-card
+        primary: Domingo
+        icon: mdi:weather-night
+        icon_color: deep-orange
+        tap_action:
+          action: call-service
+          service: script.luz_despertar_domingo
+```
