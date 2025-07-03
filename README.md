@@ -128,43 +128,108 @@ También puedes usar un único script con lógica condicional, si quieres simpli
 ### 🌙 2.2 Script para rutina de acostarse
 
 ```
-luz_acostarse:
-  alias: Luz acostarse
-  sequence:
-  - service: light.turn_on
-    target:
-      entity_id:
-        - light.led_dormitorio
-    data:
-      brightness: 100
-      rgb_color:
-      - 240
-      - 180
-      - 120  # tono cálido
-      transition: 60
+alias: Luz acostarse
+sequence:
+  - target:
+      entity_id:
+        - light.lampara_susana
+        - light.lampara_pedro
+        - light.led_dormitorio
+    data:
+      brightness: 255
+      rgb_color:
+        - 255
+        - 255
+        - 255
+      transition: 5
+    action: light.turn_on
+  - delay:
+      hours: 0
+      minutes: 1
+      seconds: 0
+      milliseconds: 0
+  - target:
+      entity_id:
+        - light.lampara_susana
+        - light.lampara_pedro
+        - light.led_dormitorio
+    data:
+      rgb_color:
+        - 255
+        - 230
+        - 200
+      transition: 20
+    action: light.turn_on
+  - delay:
+      seconds: 20
+  - target:
+      entity_id:
+        - light.lampara_susana
+        - light.lampara_pedro
+        - light.led_dormitorio
+    data:
+      rgb_color:
+        - 255
+        - 200
+        - 160
+      transition: 20
+    action: light.turn_on
+  - delay:
+      seconds: 20
+  - target:
+      entity_id:
+        - light.lampara_susana
+        - light.lampara_pedro
+        - light.led_dormitorio
+    data:
+      rgb_color:
+        - 250
+        - 170
+        - 110
+      transition: 20
+    action: light.turn_on
+  - delay:
+      seconds: 20
+  - target:
+      entity_id:
+        - light.lampara_susana
+        - light.lampara_pedro
+        - light.led_dormitorio
+    data:
+      rgb_color:
+        - 240
+        - 150
+        - 80
+      brightness: 180
+      transition: 20
+    action: light.turn_on
 ```
+Se ha añadido una transición de tonos de color.
 
-### 😴 2.3 Script para dormir profundamente
+### 😴 2.3 Script para dormir
 
 ```
-luz_dormir:
-  alias: Luz dormir
-  sequence:
-    - service: light.turn_off
-      target:
-        entity_id:
-          - light.lampara_susana
-          - light.lampara_pedro
-    - service: light.turn_on
-      target:
-        entity_id: light.led_dormitorio
-      data:
-        brightness: 10
-        rgb_color:
-        - 255
-        - 100
-        - 60
-        transition: 30
+alias: Dormir - apagar luces
+description: ""
+triggers:
+  - event_type: call_service
+    event_data:
+      domain: script
+      service: turn_on
+      service_data:
+        entity_id: script.luz_dormir
+    trigger: event
+actions:
+  - target:
+      entity_id:
+        - light.lampara_pedro
+        - light.lampara_susana
+        - light.led_dormitorio
+    data:
+      transition: 5
+    action: light.turn_off
+mode: single
+
 ```
 
 ## ⚙️ Paso 3: Automatizaciones
