@@ -1,5 +1,5 @@
 # Iluminación habitación adaptada a horarios
-Vamos montar un sistema de despertar y acostarse totalmente automático en Home Assistant,  con control por estados como “Vacaciones” o “Ausente”.
+Vamos montar un sistema de despertar y acostarse totalmente automático en Home Assistant,  con control por estados como “Vacaciones” o “Ausente”. El sistema de alumbrado se compone de dos lamparitas Meross MSL430 y una tira led Meross MSL320PHK.
 
 ## 🧠 ¿Qué queremos lograr?
 
@@ -229,7 +229,6 @@ actions:
       transition: 5
     action: light.turn_off
 mode: single
-
 ```
 
 ## ⚙️ Paso 3: Automatizaciones
