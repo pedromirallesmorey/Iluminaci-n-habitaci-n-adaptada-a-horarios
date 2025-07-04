@@ -3,15 +3,17 @@ Vamos montar un sistema de despertar y acostarse totalmente automático en Home 
 
 ## 🧠 ¿Qué queremos lograr?
 
-✅ Luces que se encienden al despertar según el día y la hora que elijas
+✅ Luces que se encienden al despertar según el día y la hora que elijas (V 1.0)
 
-🌛 Una rutina nocturna con luz cálida y relajante antes de dormir
+🌛 Una rutina nocturna con luz cálida y relajante antes de dormir (V 1.0)
 
-🎚️ Posibilidad de activar o desactivar cualquier rutina con un interruptor
+🎚️ Posibilidad de activar o desactivar cualquier rutina con un interruptor (V 1.0)
 
-🏖️ Un selector de estado del hogar que pausa automáticamente las rutinas si estás de vacaciones o fuera
+🏖️ Un selector de estado del hogar que pausa automáticamente las rutinas si estás de vacaciones o fuera (V 1.0)
 
-📱 Un panel visual elegante para controlar todo desde tu móvil, tablet o dashboard
+📱 Un panel visual elegante para controlar todo desde tu móvil, tablet o dashboard (V 1.0)
+
+✅ Establecer estado predeterminado al encender (V 1.1)
 
 ## 🔧 Paso 1: Creación de Ayudantes (helpers)
 
@@ -535,3 +537,39 @@ input_datetime.hora_domingo
 
 input_datetime.hora_para_acostarse
 
+## ✅ V1.1
+
+## Establecer estado predeterminado al encender manualmente
+
+Haremos que las luces vuelvan al estado deseado (blanco, 80 % de brillo) sin parpadeos ni inconsistencias:
+
+🧠 1. Automatización que intercepta la orden de encendido
+
+Puedes crear una automatización que detecte cuándo una luz se enciende sin color definido, y reestablece tus parámetros.
+
+🛡️ Automatización silenciosa que corrige luces al blanco si se encienden sin color definido:
+
+```
+alias: Restaurar estado blanco al encender
+trigger:
+  - platform: state
+    entity_id:
+      - light.lampara_susana
+      - light.lampara_pedro
+      - light.led_dormitorio
+    to: "on"
+condition:
+  - condition: template
+    value_template: >
+      {{ state_attr(trigger.entity_id, 'color_temp') == None }}
+action:
+  - service: light.turn_on
+    target:
+      entity_id: "{{ trigger.entity_id }}"
+    data:
+      color_temp: 250
+      brightness_pct: 80
+mode: queued
+```
+
+🪄 Esto hace magia silenciosa: si alguien enciende la luz desde Alexa o el panel sin definir color, el sistema lo corrige.
