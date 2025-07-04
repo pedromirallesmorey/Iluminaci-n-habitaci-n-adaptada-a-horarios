@@ -477,34 +477,61 @@ cards:
 ## ✳️ Resumen de entidades:
 
 Automatizaciones
+
 automation.acostarse_rutina_nocturna
+
 automation.dormir_apagar_luces
+
 automation.despertar_por_dia
 
 Escenas
+
 scene.dormitorio_blanco
+
 scene.dormitorio_led_dormir
 
 Scripts
+
 script.luz_acostarse
+
 script.luz_dormir
+
 script.luz_despertar_lunes
+
 script.luz_despertar_martes
+
 script.luz_despertar_miercoles
+
 script.luz_despertar_jueves
+
 script.luz_despertar_viernes
+
 script.luz_despertar_sabado
+
 script.luz_despertar_domingo
 
+
 Ayudantes
+
 input_boolean.rutina_de_acostarse_activada
+
 input_boolean.rutina_de_despertar_activada
+
 input_datetime.ultimo_despertar_ejecutado
+
 input_datetime.hora_lunes
+
 input_datetime.hora_martes
+
 input_datetime.hora_miercoles
+
 input_datetime.hora_jueves
+
 input_datetime.hora_viernes
+
 input_datetime.hora_sabado
+
 input_datetime.hora_domingo
+
 input_datetime.hora_para_acostarse
+
