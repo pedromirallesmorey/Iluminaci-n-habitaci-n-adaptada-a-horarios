@@ -474,7 +474,7 @@ cards:
           action: call-service
           service: script.luz_despertar_domingo
 ```
-### ✳️ Resumen de entidades:
+## ✳️ Resumen de entidades:
 
 Automatizaciones
 automation.acostarse_rutina_nocturna
