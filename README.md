@@ -15,6 +15,47 @@ Vamos montar un sistema de despertar y acostarse totalmente automático en Home 
 
 ✅ Establecer estado predeterminado al encender (V 1.1)
 
+## 🧩 Estructura General
+
+```
+parte-diario-matutino/
+
+├── scenes/
+│   ├── scene.dormitorio_led_dormir
+│   └── scene.dormitorio_blanco
+├── automations/
+│   ├── automation.acostarse_rutina_nocturna
+│   ├── automation.despertar_por_dia
+│   └── automation.dormir_apagar_luces
+├── scripts/
+│   ├── script.luz_acostarse
+│   ├── script.luz_dormir
+│   ├── script.luz_despertar_lunes
+│   ├── script.luz_despertar_martes
+│   ├── script.luz_despertar_miercoles
+│   ├── script.luz_despertar_jueves
+│   ├── script.luz_despertar_viernes
+│   ├── script.luz_despertar_sabado
+│   └── script.luz_despertar_domingo
+├── helpers/
+│   ├── input_boolean.rutina_de_acostarse_activada
+│   ├── input_boolean.rutina_de_despertar_activada
+│   ├── input_datetime.ultimo_despertar_ejecutado
+│   ├── input_datetime.hora_lunes
+│   ├── input_datetime.hora_martes
+│   ├── input_datetime.hora_miercoles
+│   ├── input_datetime.hora_jueves
+│   ├── input_datetime.hora_viernes
+│   ├── input_datetime.hora_sabado
+│   ├── input_datetime.hora_domingo
+│   └──input_datetime.hora_para_acostarse
+├── panels/
+│   ├── despertar.yaml
+│   ├── acostarse.yaml
+│   └── control_manual.yaml
+├── README.md
+```
+
 ## 🔧 Paso 1: Creación de Ayudantes (helpers)
 
 ### 🧩 1.1 Selector de estado del hogar (para pausar rutinas automáticamente)
